@@ -7,7 +7,7 @@ services:
     - docker
 env:
     global:
-        - DEV_BRANCH=dev
+        - DEV_BRANCH=inital_main
         - RELEASE_BRANCH=main
         - POST_RELEASE_BRANCH=main
         - RELEASE_MESSAGE=release
