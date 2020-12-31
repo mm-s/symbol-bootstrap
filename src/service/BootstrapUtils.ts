@@ -22,15 +22,7 @@ import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import { totalmem } from 'os';
 import { basename, join } from 'path';
-import {
-    Deadline,
-    DtoMapping,
-    LinkAction,
-    NetworkType,
-    Transaction,
-    UInt64,
-    VotingKeyLinkTransaction,
-} from 'symbol-sdk';
+import { Deadline, DtoMapping, LinkAction, NetworkType, Transaction, UInt64, VotingKeyLinkTransaction } from 'symbol-sdk';
 import * as util from 'util';
 import { LogType } from '../logger';
 import Logger from '../logger/Logger';
@@ -206,7 +198,7 @@ export class BootstrapUtils {
             presetData.votingKeyEndEpoch,
             LinkAction.Link,
             presetData.networkType,
-            2,
+            1,
             maxFee,
         );
     }
