@@ -62,8 +62,8 @@ maxNameSize: 64
 maxChildNamespaces: 256
 maxNamespaceDepth: 3
 batchVerificationRandomSource:
-symbolServerToolsImage: symbolplatform/symbol-server:tools-gcc-0.10.0.4
-symbolServerImage: symbolplatform/symbol-server:gcc-0.10.0.4
+symbolServerToolsImage: symbolplatform/symbol-server-private:tools-gcc-main-c96d7a2dd7
+symbolServerImage: symbolplatform/symbol-server-private:gcc-main-c96d7a2dd7
 symbolRestImage: symbolplatform/symbol-rest:2.2.1
 symbolExplorerImage: symbolplatform/symbol-explorer:0.6.3-alpha
 symbolWalletImage: symbolplatform/symbol-desktop-wallet:0.13.6
@@ -117,8 +117,8 @@ nodeListenInterface: 0.0.0.0
 serverVersion: 0.10.0.4
 enableTransactionSpamThrottling: true
 transactionSpamThrottlingMaxBoostFee: 10000000
-maxHashesPerSyncAttempt: 610
-maxBlocksPerSyncAttempt: 602
+maxHashesPerSyncAttempt: 730
+maxBlocksPerSyncAttempt: 720
 maxChainBytesPerSyncAttempt: 100MB
 shortLivedCacheTransactionDuration: 10m
 shortLivedCacheBlockDuration: 100m
@@ -196,8 +196,3 @@ baseRetryDelay: 750
 votingKeyStartEpoch: 1
 votingKeyEndEpoch: 26280
 enableRevoteOnBoot: true
-
-#fork height
-votingKeyLinkV2: 0
-importanceBlock: 0
-accountRestrictionsV2: 0

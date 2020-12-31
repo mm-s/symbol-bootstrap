@@ -227,10 +227,6 @@ config-network.properties
     harvestNetworkPercentage; 5; uint8_t; Percentage of the harvested fee that is collected by the network.
     harvestNetworkFeeSinkAddress; TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q; Address; Address of the harvest network fee sink account.
     maxTransactionsPerBlock; 6'000; uint32_t; Maximum number of transactions per block.
-    **fork_heights**;
-    votingKeyLinkV2; 0
-    importanceBlock; 0
-    accountRestrictionsV2; 0
     **plugin:catapult.plugins.accountlink**;
     dummy; to trigger plugin load
     **plugin:catapult.plugins.aggregate**; ; ;
@@ -291,8 +287,8 @@ config-node.properties
     enableAutoSyncCleanup; true; bool; Set to true if temporary sync files should be automatically cleaned up. Note: This should be Set to false if broker process is running.
     enableTransactionSpamThrottling; true; bool; Set to true if transaction spam throttling should be enabled.
     transactionSpamThrottlingMaxBoostFee; 10'000'000; Amount; Maximum fee that will boost a transaction through the spam throttle when spam throttling is enabled.
-    maxHashesPerSyncAttempt; 610; ;
-    maxBlocksPerSyncAttempt; 602; uint32_t; Maximum number of blocks per sync attempt.
+    maxHashesPerSyncAttempt; 730; ;
+    maxBlocksPerSyncAttempt; 720; uint32_t; Maximum number of blocks per sync attempt.
     maxChainBytesPerSyncAttempt; 100MB; utils::FileSize; Maximum chain bytes per sync attempt.
     shortLivedCacheTransactionDuration; 10m; utils::TimeSpan; Duration of a transaction in the short lived cache.
     shortLivedCacheBlockDuration; 100m; utils::TimeSpan; Duration of a block in the short lived cache.
