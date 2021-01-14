@@ -33,7 +33,7 @@ export class BackupSyncService {
 
     public async run(presetData: ConfigPreset): Promise<void> {
         if (!presetData.backupSyncLocation) {
-            throw new Error(`Fast Sync cannot be executed. backupSyncLocation has not been defined.`);
+            throw new Error(`Backup Sync cannot be executed. backupSyncLocation has not been defined.`);
         }
         await BootstrapUtils.mkdir(join(this.root, 'backup-sync'));
         const globalDestination = join(
@@ -47,7 +47,7 @@ export class BackupSyncService {
             (presetData.databases || []).map(async (db) => {
                 const destinationFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, db.name);
                 if (existsSync(destinationFolder)) {
-                    logger.info(`${destinationFolder} exist. Fast Sync ignored.`);
+                    logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
                     return;
                 }
                 await BootstrapUtils.deleteFolder(destinationFolder);
@@ -59,7 +59,7 @@ export class BackupSyncService {
             (presetData.nodes || []).map(async (node) => {
                 const destinationFolder = BootstrapUtils.getTargetNodesFolder(this.params.target, false, node.name, 'data');
                 if (existsSync(destinationFolder)) {
-                    logger.info(`${destinationFolder} exist. Fast Sync ignored.`);
+                    logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
                     return;
                 }
                 await BootstrapUtils.deleteFolder(destinationFolder);
@@ -74,7 +74,7 @@ export class BackupSyncService {
             file: globalDestination,
             storeEntries: true,
         });
-        logger.info(`Unziping Fast Sync's ${innerFolder} into ${targetFolder}`);
+        logger.info(`Unziping Backup Sync's ${innerFolder} into ${targetFolder}`);
         return new Promise<void>((resolve, reject) => {
             zip.on('ready', () => {
                 zip.extract(innerFolder, targetFolder, (err) => {

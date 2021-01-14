@@ -1,0 +1,2 @@
+backupSyncLocation: ./backup-sync/testnet-backup/testnet-local-minimal-backup.zip
+backupSyncLocalCacheFileName: testnet-local-minimal-backup.zip

@@ -147,13 +147,13 @@ export class ConfigService {
                 if (this.params.backupSync) {
                     const backupSyncService = new BackupSyncService(this.root, this.params);
                     await backupSyncService.run(presetData);
-                    logger.info('Fast sync has been executed...');
+                    logger.info('Backup Sync has been executed...');
                 } else {
                     await this.generateNemesis(presetData, addresses);
                 }
             } else {
                 if (this.params.backupSync) {
-                    logger.info('Fast sync cannot be executed when upgrading...');
+                    logger.info('Backup Sync cannot be executed when upgrading...');
                 } else {
                     logger.info('Nemesis data cannot be generated or copied when upgrading...');
                 }
