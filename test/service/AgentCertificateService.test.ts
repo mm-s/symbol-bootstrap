@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { expect } from 'chai';
+import { promises as fsPromises } from 'fs';
 import 'mocha';
 import { BootstrapUtils, ConfigLoader, Preset } from '../../src/service';
 import { AgentCertificateService } from '../../src/service/AgentCertificateService';
@@ -31,5 +33,8 @@ describe('AgentCertificateService', () => {
         });
 
         await service.run(presetData.symbolServerToolsImage, 'supernode', target);
+
+        const files = await fsPromises.readdir(target);
+        expect(files).deep.eq(['agent-crt.pem', 'agent-key.pem']);
     });
 });
