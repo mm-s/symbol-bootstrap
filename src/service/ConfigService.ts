@@ -178,7 +178,6 @@ export class ConfigService {
     private async generateNemesis(presetData: ConfigPreset, addresses: Addresses) {
         const target = this.params.target;
         const nemesisSeedFolder = BootstrapUtils.getTargetNemesisFolder(target, false, 'seed');
-
         if (!presetData.nemesisSeedFolder && presetData.nemesis) {
             await this.generateNemesisConfig(presetData, addresses);
         } else {
@@ -186,6 +185,12 @@ export class ConfigService {
             await BootstrapUtils.generateConfiguration({}, copyFrom, nemesisSeedFolder);
         }
 
+        return await this.copyNemesisSeed(presetData, addresses);
+    }
+
+    private async copyNemesisSeed(presetData: ConfigPreset, addresses: Addresses) {
+        const target = this.params.target;
+        const nemesisSeedFolder = BootstrapUtils.getTargetNemesisFolder(target, false, 'seed');
         BootstrapUtils.validateFolder(nemesisSeedFolder);
         await Promise.all(
             (addresses.nodes || []).map(async (account) => {

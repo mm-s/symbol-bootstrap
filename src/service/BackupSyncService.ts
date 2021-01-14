@@ -21,9 +21,11 @@ import Logger from '../logger/Logger';
 import LoggerFactory from '../logger/LoggerFactory';
 import { ConfigPreset } from '../model';
 import { BootstrapUtils } from './BootstrapUtils';
+import { Preset } from './ConfigService';
 
 type BackupSyncParams = {
     readonly target: string;
+    readonly preset: Preset;
 };
 
 const logger: Logger = LoggerFactory.getLogger(LogType.System);
@@ -62,6 +64,8 @@ export class BackupSyncService {
                     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
                     return;
                 }
+                // const seedFolder = presetData.nemesisSeedFolder || join(this.root, 'presets', this.params.preset, 'seed');
+                // await BootstrapUtils.generateConfiguration({}, seedFolder, destinationFolder);
                 await BootstrapUtils.deleteFolder(destinationFolder);
                 await BootstrapUtils.mkdir(destinationFolder);
                 await this.unzip(globalDestination, 'data', destinationFolder);
@@ -74,7 +78,7 @@ export class BackupSyncService {
             file: globalDestination,
             storeEntries: true,
         });
-        logger.info(`Unziping Backup Sync's ${innerFolder} into ${targetFolder}`);
+        logger.info(`Unziping Fast Sync's ${innerFolder} into ${targetFolder}`);
         return new Promise<void>((resolve, reject) => {
             zip.on('ready', () => {
                 zip.extract(innerFolder, targetFolder, (err) => {
