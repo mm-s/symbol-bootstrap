@@ -18,14 +18,14 @@ import { expect } from '@oclif/test';
 import { existsSync } from 'fs';
 import 'mocha';
 import { BootstrapUtils, ConfigLoader, Preset } from '../../src/service';
-import { FastSyncService } from '../../src/service/FastSyncService';
+import { BackupSyncService } from '../../src/service/BackupSyncService';
 
-describe('FastSyncService', () => {
+describe('BackupSyncService', () => {
     it('run', async () => {
-        const target = 'target/FastSyncService.test';
+        const target = 'target/BackupSyncService.test';
         await BootstrapUtils.deleteFolder(target);
         await BootstrapUtils.mkdir(target);
-        const service = new FastSyncService('.', { target: target });
+        const service = new BackupSyncService('.', { target: target });
 
         const preset = Preset.testnet;
         const presetData = new ConfigLoader().createPresetData({
@@ -33,8 +33,8 @@ describe('FastSyncService', () => {
             preset: preset,
             assembly: 'dual',
             customPresetObject: {
-                fastSyncBackupLocation: 'https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-unit-test.zip',
-                fastSyncStoredName: 'testnet-unit-test.zip',
+                backupSyncLocation: 'https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-unit-test.zip',
+                backupSyncLocalCacheFileName: 'testnet-unit-test.zip',
             },
         });
         await service.run(presetData);

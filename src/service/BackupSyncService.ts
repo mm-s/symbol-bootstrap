@@ -22,26 +22,26 @@ import LoggerFactory from '../logger/LoggerFactory';
 import { ConfigPreset } from '../model';
 import { BootstrapUtils } from './BootstrapUtils';
 
-type FastSyncParams = {
+type BackupSyncParams = {
     readonly target: string;
 };
 
 const logger: Logger = LoggerFactory.getLogger(LogType.System);
 
-export class FastSyncService {
-    constructor(private readonly root: string, protected readonly params: FastSyncParams) {}
+export class BackupSyncService {
+    constructor(private readonly root: string, protected readonly params: BackupSyncParams) {}
 
     public async run(presetData: ConfigPreset): Promise<void> {
-        if (!presetData.fastSyncBackupLocation) {
-            throw new Error(`Fast Sync cannot be executed. fastSyncBackupLocation has not been defined.`);
+        if (!presetData.backupSyncLocation) {
+            throw new Error(`Fast Sync cannot be executed. backupSyncLocation has not been defined.`);
         }
-        await BootstrapUtils.mkdir(join(this.root, 'fast-sync'));
+        await BootstrapUtils.mkdir(join(this.root, 'backup-sync'));
         const globalDestination = join(
             this.root,
-            'fast-sync',
-            presetData.fastSyncStoredName || `backup-${presetData.nemesisGenerationHashSeed}.zip`,
+            'backup-sync',
+            presetData.backupSyncLocalCacheFileName || `backup-${presetData.nemesisGenerationHashSeed}.zip`,
         );
-        await BootstrapUtils.download(presetData.fastSyncBackupLocation, globalDestination);
+        await BootstrapUtils.download(presetData.backupSyncLocation, globalDestination);
 
         await Promise.all(
             (presetData.databases || []).map(async (db) => {

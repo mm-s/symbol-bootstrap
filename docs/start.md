@@ -46,8 +46,8 @@ OPTIONS
   --args=args
       Add extra arguments to the docker-compose up command. Check out https://docs.docker.com/compose/reference/up.
 
-  --fastSync
-      It downloads a backup with the mongo and rockdb databases to faster sync.
+  --backupSync
+      It downloads a backup with the mongo and rockdb databases for faster synchronization.
 
   --healthCheck
       It checks if the services created with docker compose are up and running.

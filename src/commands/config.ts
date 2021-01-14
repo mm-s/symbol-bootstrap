@@ -57,9 +57,9 @@ export default class Config extends Command {
             default: ConfigService.defaultParams.report,
         }),
 
-        fastSync: flags.boolean({
-            description: 'It downloads a backup with the mongo and rockdb databases to faster sync.',
-            default: ConfigService.defaultParams.fastSync,
+        backupSync: flags.boolean({
+            description: 'It downloads a backup with the mongo and rockdb databases for faster synchronization.',
+            default: ConfigService.defaultParams.backupSync,
         }),
 
         pullImages: flags.boolean({

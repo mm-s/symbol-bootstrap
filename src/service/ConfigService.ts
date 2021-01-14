@@ -34,10 +34,10 @@ import Logger from '../logger/Logger';
 import LoggerFactory from '../logger/LoggerFactory';
 import { Addresses, ConfigPreset, NodeAccount, NodePreset, NodeType } from '../model';
 import { AgentCertificateService } from './AgentCertificateService';
+import { BackupSyncService } from './BackupSyncService';
 import { BootstrapUtils } from './BootstrapUtils';
 import { CertificateService } from './CertificateService';
 import { ConfigLoader } from './ConfigLoader';
-import { FastSyncService } from './FastSyncService';
 import { NemgenService } from './NemgenService';
 import { ReportService } from './ReportService';
 import { VotingService } from './VotingService';
@@ -57,7 +57,7 @@ export interface ConfigParams {
     preset: Preset;
     target: string;
     user: string;
-    fastSync?: boolean;
+    backupSync?: boolean;
     pullImages?: boolean;
     assembly?: string;
     customPreset?: string;
@@ -79,7 +79,7 @@ export class ConfigService {
         reset: false,
         upgrade: false,
         pullImages: false,
-        fastSync: false,
+        backupSync: false,
         user: BootstrapUtils.CURRENT_USER,
     };
     private readonly configLoader: ConfigLoader;
@@ -144,15 +144,15 @@ export class ConfigService {
             await this.generateExplorers(presetData);
             await this.generateWallets(presetData);
             if (!oldPresetData && !oldAddresses) {
-                if (this.params.fastSync) {
-                    const fastSyncService = new FastSyncService(this.root, this.params);
-                    await fastSyncService.run(presetData);
+                if (this.params.backupSync) {
+                    const backupSyncService = new BackupSyncService(this.root, this.params);
+                    await backupSyncService.run(presetData);
                     logger.info('Fast sync has been executed...');
                 } else {
                     await this.generateNemesis(presetData, addresses);
                 }
             } else {
-                if (this.params.fastSync) {
+                if (this.params.backupSync) {
                     logger.info('Fast sync cannot be executed when upgrading...');
                 } else {
                     logger.info('Nemesis data cannot be generated or copied when upgrading...');
