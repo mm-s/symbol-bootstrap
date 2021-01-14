@@ -37,6 +37,7 @@ import { AgentCertificateService } from './AgentCertificateService';
 import { BootstrapUtils } from './BootstrapUtils';
 import { CertificateService } from './CertificateService';
 import { ConfigLoader } from './ConfigLoader';
+import { FastSyncService } from './FastSyncService';
 import { NemgenService } from './NemgenService';
 import { ReportService } from './ReportService';
 import { VotingService } from './VotingService';
@@ -56,7 +57,8 @@ export interface ConfigParams {
     preset: Preset;
     target: string;
     user: string;
-    pullImages?: boolean;
+    fastSync: boolean;
+    pullImages: boolean;
     assembly?: string;
     customPreset?: string;
     customPresetObject?: any;
@@ -77,6 +79,7 @@ export class ConfigService {
         reset: false,
         upgrade: false,
         pullImages: false,
+        fastSync: false,
         user: BootstrapUtils.CURRENT_USER,
     };
     private readonly configLoader: ConfigLoader;
@@ -141,9 +144,19 @@ export class ConfigService {
             await this.generateExplorers(presetData);
             await this.generateWallets(presetData);
             if (!oldPresetData && !oldAddresses) {
-                await this.generateNemesis(presetData, addresses);
+                if (this.params.fastSync) {
+                    const fastSyncService = new FastSyncService(this.root, this.params);
+                    await fastSyncService.run(presetData);
+                    logger.info('Fast sync has been executed...');
+                } else {
+                    await this.generateNemesis(presetData, addresses);
+                }
             } else {
-                logger.info('Nemesis data cannot be generated or copied when upgrading...');
+                if (this.params.fastSync) {
+                    logger.info('Fast sync cannot be executed when upgrading...');
+                } else {
+                    logger.info('Nemesis data cannot be generated or copied when upgrading...');
+                }
             }
 
             if (this.params.report) {

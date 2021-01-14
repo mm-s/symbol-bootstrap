@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
+import { expect } from '@oclif/test';
+import { existsSync } from 'fs';
 import 'mocha';
 import { BootstrapUtils, ConfigLoader, Preset } from '../../src/service';
-import { AgentCertificateService } from '../../src/service/AgentCertificateService';
+import { FastSyncService } from '../../src/service/FastSyncService';
 
-describe('AgentCertificateService', () => {
-    it('createCertificate', async () => {
-        const target = 'target/AgentCertificateService';
+describe('FastSyncService', () => {
+    it('run', async () => {
+        const target = 'target/FastSyncService.test';
         await BootstrapUtils.deleteFolder(target);
         await BootstrapUtils.mkdir(target);
-        const service = new AgentCertificateService('.', { target: target, user: await BootstrapUtils.getDockerUserGroup() });
+        const service = new FastSyncService('.', { target: target });
 
+        const preset = Preset.testnet;
         const presetData = new ConfigLoader().createPresetData({
             root: '.',
-            preset: Preset.bootstrap,
+            preset: preset,
+            assembly: 'dual',
+            customPresetObject: {
+                fastSyncBackupLocation: 'https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-unit-test.zip',
+                fastSyncStoredName: 'testnet-unit-test.zip',
+            },
         });
-
-        await service.run(presetData.symbolServerToolsImage, 'supernode', target);
+        await service.run(presetData);
+        expect(existsSync(`${target}/nodes/api-node/data/00000/00002.dat`)).eq(true);
+        expect(existsSync(`${target}/databases/db/mongod.lock`)).eq(true);
     });
 });

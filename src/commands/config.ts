@@ -57,6 +57,11 @@ export default class Config extends Command {
             default: ConfigService.defaultParams.report,
         }),
 
+        fastSync: flags.boolean({
+            description: 'It downloads a backup with the mongo and rockdb databases to faster sync.',
+            default: ConfigService.defaultParams.fastSync,
+        }),
+
         pullImages: flags.boolean({
             description:
                 'It pulls the utility images from DockerHub when running the configuration. It only affects alpha/dev docker images.',

@@ -32,6 +32,8 @@ votingKeyLinkV2: 215500
 importanceBlock: 215500
 accountRestrictionsV2: 215500
 trustedHosts:
+fastSyncBackupLocation: https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-partial-backup.zip
+fastSyncStoredName: testnet-partial-backup.zip
 inflation:
     starting-at-height-2: 95998521
     starting-at-height-200: 91882261
