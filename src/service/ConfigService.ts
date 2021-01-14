@@ -57,8 +57,8 @@ export interface ConfigParams {
     preset: Preset;
     target: string;
     user: string;
-    fastSync: boolean;
-    pullImages: boolean;
+    fastSync?: boolean;
+    pullImages?: boolean;
     assembly?: string;
     customPreset?: string;
     customPresetObject?: any;
