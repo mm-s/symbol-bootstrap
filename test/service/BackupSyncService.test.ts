@@ -25,13 +25,14 @@ describe('BackupSyncService', () => {
         const target = 'target/BackupSyncService.test';
         await BootstrapUtils.deleteFolder(target);
         await BootstrapUtils.mkdir(target);
-        const service = new BackupSyncService('.', { target: target });
-
         const preset = Preset.testnet;
+        const service = new BackupSyncService('.', { target: target, preset: preset });
+
         const presetData = new ConfigLoader().createPresetData({
             root: '.',
             preset: preset,
             assembly: 'dual',
+            password: undefined,
             customPresetObject: {
                 backupSyncLocation: 'https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-unit-test.zip',
                 backupSyncLocalCacheFileName: 'testnet-unit-test.zip',

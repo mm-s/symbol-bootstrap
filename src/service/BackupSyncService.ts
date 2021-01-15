@@ -78,7 +78,7 @@ export class BackupSyncService {
             file: globalDestination,
             storeEntries: true,
         });
-        logger.info(`Unziping Fast Sync's ${innerFolder} into ${targetFolder}`);
+        logger.info(`Unzipping Backup Sync's ${innerFolder} into ${targetFolder}`);
         return new Promise<void>((resolve, reject) => {
             zip.on('ready', () => {
                 zip.extract(innerFolder, targetFolder, (err) => {
