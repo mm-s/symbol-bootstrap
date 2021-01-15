@@ -14,12 +14,6 @@ services:
         volumes:
             - './mongo:/docker-entrypoint-initdb.d:ro'
             - '../databases/db-0:/dbdata:rw'
-        cpu_count: 2
-        mac_address: '02:42:ac:11:65:43'
-        deploy:
-            resources:
-                reservations:
-                    memory: 4G
     peer-node-0:
         user: '1000:1000'
         container_name: peer-node-0
@@ -33,12 +27,11 @@ services:
         volumes:
             - '../nodes/peer-node-0:/symbol-workdir:rw'
             - './server:/symbol-commands:ro'
-        cpu_count: 4
-        shm_size: 64M
-        deploy:
-            resources:
-                limits:
-                    memory: 4G
+        security_opt:
+            - 'seccomp:unconfined'
+        cap_add:
+            - ALL
+        privileged: true
         networks:
             default:
                 aliases:
@@ -57,12 +50,11 @@ services:
         volumes:
             - '../nodes/peer-node-1:/symbol-workdir:rw'
             - './server:/symbol-commands:ro'
-        cpu_count: 4
-        shm_size: 64M
-        deploy:
-            resources:
-                limits:
-                    memory: 4G
+        security_opt:
+            - 'seccomp:unconfined'
+        cap_add:
+            - ALL
+        privileged: true
         networks:
             default:
                 aliases:
@@ -81,6 +73,11 @@ services:
             - './server:/symbol-commands:ro'
         depends_on:
             - api-node-broker-0
+        security_opt:
+            - 'seccomp:unconfined'
+        cap_add:
+            - ALL
+        privileged: true
         networks:
             default:
                 aliases:
@@ -101,6 +98,11 @@ services:
         volumes:
             - '../nodes/api-node-0:/symbol-workdir:rw'
             - './server:/symbol-commands:ro'
+        security_opt:
+            - 'seccomp:unconfined'
+        cap_add:
+            - ALL
+        privileged: true
     rest-gateway-0:
         container_name: rest-gateway-0
         user: '1000:1000'
@@ -115,6 +117,11 @@ services:
             - '../gateways/rest-gateway-0:/symbol-workdir:rw'
         depends_on:
             - db-0
+        security_opt:
+            - 'seccomp:unconfined'
+        cap_add:
+            - ALL
+        privileged: true
         networks:
             default:
                 ipv4_address: 172.20.0.25
