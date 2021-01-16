@@ -58,7 +58,7 @@ export class ComposeService {
         this.configLoader = new ConfigLoader();
     }
 
-    public resolveDebugOptions(dockerComposeDebugMode: boolean, dockerComposeServiceDebugMode: boolean | undefined) {
+    public resolveDebugOptions(dockerComposeDebugMode: boolean, dockerComposeServiceDebugMode: boolean | undefined): any {
         if (dockerComposeServiceDebugMode == false) {
             return {};
         }

@@ -137,7 +137,7 @@ $ npm install -g symbol-bootstrap
 $ symbol-bootstrap COMMAND
 running command...
 $ symbol-bootstrap (-v|--version|version)
-symbol-bootstrap/0.4.0 linux-x64 node-v10.23.1
+symbol-bootstrap/0.4.1 linux-x64 node-v12.18.4
 $ symbol-bootstrap --help [COMMAND]
 USAGE
   $ symbol-bootstrap COMMAND
@@ -264,6 +264,7 @@ General users should install this tool like any other node module.
 <!-- commands -->
 # Command Topics
 
+* [`symbol-bootstrap backup`](docs/backup.md) - It backups the mongo and data folder into a Zip file that can be used for --backupSync feature. Bootstrap compose services must be stopped before calling this command.
 * [`symbol-bootstrap clean`](docs/clean.md) - It removes the target folder deleting the generated configuration and data
 * [`symbol-bootstrap compose`](docs/compose.md) - It generates the `docker-compose.yml` file from the configured network.
 * [`symbol-bootstrap config`](docs/config.md) - Command used to set up the configuration files and the nemesis block for the current network
