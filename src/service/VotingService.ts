@@ -35,8 +35,10 @@ export class VotingService {
         if (nodePreset?.voting && nodeAccount.voting) {
             const privateKeyTreeFileName = 'private_key_tree1.dat';
             const target = this.params.target;
-            const dataFolder = join(BootstrapUtils.getTargetNodesFolder(target, true, nodeAccount.name), 'data');
-            const votingKeysFolder = join(dataFolder, `votingkeys`);
+            const votingKeysFolder = join(
+                BootstrapUtils.getTargetNodesFolder(target, true, nodeAccount.name),
+                presetData.votingKeysDirectory,
+            );
             const cmd = [
                 `${presetData.catapultAppFolder}/bin/catapult.tools.votingkey`,
                 `--secret=${nodeAccount.voting.privateKey}`,

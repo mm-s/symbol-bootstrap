@@ -131,6 +131,7 @@ export interface FaucetPreset extends DockerServicePreset {
 }
 
 export interface ConfigPreset {
+    votingKeysDirectory: string;
     agentBinaryLocation: string;
     serverVersion: string;
     epochAdjustment: string;

@@ -15,7 +15,7 @@
  */
 import * as archiver from 'archiver';
 import { EntryDataFunction } from 'archiver';
-import { createWriteStream, existsSync } from 'fs';
+import { createWriteStream } from 'fs';
 import * as StreamZip from 'node-stream-zip';
 import { join } from 'path';
 import { LogType } from '../logger';
@@ -54,11 +54,11 @@ export class BackupSyncService {
         await Promise.all(
             (presetData.databases || []).map(async (db) => {
                 const destinationFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, db.name);
-                if (existsSync(destinationFolder)) {
-                    logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
-                    return;
-                }
-                await BootstrapUtils.deleteFolder(destinationFolder);
+                // if (existsSync(destinationFolder)) {
+                //     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
+                //     return;
+                // }
+                // await BootstrapUtils.deleteFolder(destinationFolder);
                 await BootstrapUtils.mkdir(destinationFolder);
                 await this.unzip(globalDestination, 'mongo', destinationFolder);
             }),
@@ -66,13 +66,13 @@ export class BackupSyncService {
         await Promise.all(
             (presetData.nodes || []).map(async (node) => {
                 const destinationFolder = BootstrapUtils.getTargetNodesFolder(this.params.target, false, node.name, 'data');
-                if (existsSync(destinationFolder)) {
-                    logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
-                    return;
-                }
-                // const seedFolder = presetData.nemesisSeedFolder || join(this.root, 'presets', this.params.preset, 'seed');
-                // await BootstrapUtils.generateConfiguration({}, seedFolder, destinationFolder);
-                await BootstrapUtils.deleteFolder(destinationFolder);
+                // if (existsSync(destinationFolder)) {
+                //     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
+                //     return;
+                // }
+                // // const seedFolder = presetData.nemesisSeedFolder || join(this.root, 'presets', this.params.preset, 'seed');
+                // // await BootstrapUtils.generateConfiguration({}, seedFolder, destinationFolder);
+                // await BootstrapUtils.deleteFolder(destinationFolder);
                 await BootstrapUtils.mkdir(destinationFolder);
                 await this.unzip(globalDestination, 'data', destinationFolder);
             }),
@@ -85,8 +85,23 @@ export class BackupSyncService {
             storeEntries: true,
         });
         logger.info(`Unzipping Backup Sync's ${innerFolder} into ${targetFolder}`);
+        let totalFiles = 0;
+        let process = 0;
         return new Promise<void>((resolve, reject) => {
+            zip.on('entry', (entry) => {
+                if (!entry.isDirectory && totalFiles) {
+                    process++;
+                    const percentage = ((process * 100) / totalFiles).toFixed(2);
+                    const message = percentage + '% | ' + process + ' files unzipped out of ' + totalFiles;
+                    BootstrapUtils.logSameLineMessage(message);
+                }
+                if (BootstrapUtils.stopProcess) {
+                    zip.close();
+                    reject(new Error('Process cancelled!'));
+                }
+            });
             zip.on('ready', () => {
+                totalFiles = zip.entriesCount;
                 zip.extract(innerFolder, targetFolder, (err) => {
                     zip.close();
                     logger.info(`Unzipped ${targetFolder} created`);

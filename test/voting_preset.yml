@@ -1,3 +1,5 @@
+backupSyncLocation: ./backup-sync/testnet-local-backup.zip
+backupSyncLocalCacheFileName: testnet-local-backup.zip
 databases:
     - compose:
           mem_limit: ~

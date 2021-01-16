@@ -137,28 +137,13 @@ export class ConfigService {
             await BootstrapUtils.mkdir(target);
 
             this.cleanUpConfiguration(presetData);
-
             await this.generateNodeCertificates(presetData, addresses);
             await this.generateAgentCertificates(presetData);
             await this.generateNodes(presetData, addresses);
+            await this.generateDataFolders(oldPresetData, oldAddresses, presetData, addresses);
             await this.generateGateways(presetData);
             await this.generateExplorers(presetData);
             await this.generateWallets(presetData);
-            if (!oldPresetData && !oldAddresses) {
-                if (this.params.backupSync) {
-                    const backupSyncService = new BackupSyncService(this.root, this.params);
-                    await backupSyncService.run(presetData);
-                    logger.info('Backup Sync has been executed...');
-                } else {
-                    await this.generateNemesis(presetData, addresses);
-                }
-            } else {
-                if (this.params.backupSync) {
-                    logger.info('Backup Sync cannot be executed when upgrading...');
-                } else {
-                    logger.info('Nemesis data cannot be generated or copied when upgrading...');
-                }
-            }
 
             if (this.params.report) {
                 await new ReportService(this.root, this.params).run(presetData);
@@ -177,6 +162,29 @@ export class ConfigService {
                 console.log(e);
             }
             throw e;
+        }
+    }
+
+    private async generateDataFolders(
+        oldPresetData: ConfigPreset | undefined,
+        oldAddresses: Addresses | undefined,
+        presetData: ConfigPreset,
+        addresses: Addresses,
+    ) {
+        if (!oldPresetData && !oldAddresses) {
+            if (this.params.backupSync) {
+                const backupSyncService = new BackupSyncService(this.root, this.params);
+                await backupSyncService.run(presetData);
+                logger.info('Backup Sync has been executed...');
+            } else {
+                await this.generateNemesis(presetData, addresses);
+            }
+        } else {
+            if (this.params.backupSync) {
+                logger.info('Backup Sync cannot be executed when upgrading...');
+            } else {
+                logger.info('Nemesis data cannot be generated or copied when upgrading...');
+            }
         }
     }
 
