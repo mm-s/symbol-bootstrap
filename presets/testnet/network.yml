@@ -28,8 +28,8 @@ mosaicRentalFeeSinkAddress: TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q
 namespaceRentalFeeSinkAddress: TDGY4DD2U4YQQGERFMDQYHPYS6M7LHIF6XUCJ4Q
 faucetUrl: 'http://faucet.testnet.symboldev.network'
 trustedHosts:
-backupSyncLocation: https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/testnet-partial-backup.zip
-backupSyncLocalCacheFileName: testnet-partial-backup.zip
+backupSyncLocation: https://symbol-bootstrap.s3-eu-west-1.amazonaws.com/testnet/backup.zip
+backupSyncLocalCacheFileName: testnet-full-backup.zip
 inflation:
     starting-at-height-2: 95998521
     starting-at-height-200: 91882261
