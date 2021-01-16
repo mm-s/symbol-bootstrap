@@ -17,8 +17,9 @@ import { Command, flags } from '@oclif/command';
 import { BootstrapService, BootstrapUtils } from '../service';
 
 export default class Backup extends Command {
-    static description =
-        'It backups the mongo and data folder into a Zip file that can be used for --backupSync feature. Bootstrap compose services must be stopped before calling this command.';
+    static description = `It backups the mongo and data folder into a Zip file that can be used for --backupSync feature. Bootstrap compose services must be stopped before calling this command.
+
+Note: this command is designed for NGL to be used when running public main or public test networks. It's not backing up any node specific information.`;
 
     static examples = [`$ symbol-bootstrap backup`];
 
@@ -29,7 +30,7 @@ export default class Backup extends Command {
             description: `The dual/api node name to be used to backup the data. If not provided, the first configured api/dual node would be used.`,
         }),
         destinationFile: flags.string({
-            description: `The file location where the backup zip file will be created. Default destination is ./target/backup.zip.`,
+            description: `The file location where the backup zip file will be created. Default destination is target/backup.zip.`,
         }),
     };
 

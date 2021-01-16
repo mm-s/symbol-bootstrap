@@ -111,21 +111,32 @@ export class BackupSyncService {
             // listen for all archive data to be written
             // 'close' event is fired only when a file descriptor is involved
             output.on('close', () => {
+                console.log('');
                 logger.info(
                     `Zip file ${destination} size ${archive.pointer() / 1024} MB has been created. You can now share it for --backupSync.`,
                 );
                 resolve();
             });
 
+            const mongoFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, database.name);
+            const mongoTotalFiles = BootstrapUtils.getFilesRecursively(mongoFolder).length;
+            logger.info(`Adding '${mongoFolder}' to zip file ${destination}`);
+            const dataFolder = BootstrapUtils.getTargetNodesFolder(this.params.target, false, `${node.name}/`, 'data');
+            const dataTotalFiles = BootstrapUtils.getFilesRecursively(dataFolder).length;
+            logger.info(`Adding '${dataFolder}' to zip file ${destination}`);
+            const totalFiles = mongoTotalFiles + dataTotalFiles;
+
             // This event is fired when the data source is drained no matter what was the data source.
             // It is not part of this library but rather from the NodeJS Stream API.
             // @see: https://nodejs.org/api/stream.html#stream_event_end
             output.on('end', () => {
-                console.log('Data has been drained');
+                console.log('');
+                logger.warn('Data has been drained');
             });
 
             // good practice to catch warnings (ie stat failures and other non-blocking errors)
             archive.on('warning', (err: any) => {
+                console.log('');
                 if (err.code === 'ENOENT') {
                     // log warning
                     logger.warn(`There has been an warning creating ZIP file '${destination}' ${err.message || err}`);
@@ -135,6 +146,8 @@ export class BackupSyncService {
                     reject(err);
                 }
             });
+
+            let process = 0;
             // good practice to catch this error explicitly
             archive.on('error', function (err: any) {
                 logger.error(`There has been an error creating ZIP file '${destination}' ${err.message || err}`);
@@ -145,24 +158,26 @@ export class BackupSyncService {
             archive.pipe(output);
 
             const filter: EntryDataFunction = (entry) => {
+                if (!entry.stats?.isDirectory()) {
+                    process++;
+                    const percentage = ((process * 100) / totalFiles).toFixed(2);
+                    const message = percentage + '% | ' + process + ' files zipped out of ' + totalFiles;
+                    BootstrapUtils.logSameLineMessage(message);
+                }
                 const ignoreFiles = ['server.lock', 'broker.started', 'broker.lock'];
                 if (ignoreFiles.indexOf(entry.name) > -1) {
-                    logger.info(`Excluding file '${entry.name}'`);
+                    console.log(`\nExcluding file '${entry.name}'`);
                     return false;
                 }
                 const ignoreDirectories = ['spool'];
                 const ignoreEntryDirectory = ignoreDirectories.find((d) => entry.name.startsWith(d));
                 if (ignoreEntryDirectory) {
-                    if (entry.name === ignoreEntryDirectory) logger.info(`Excluding directory '${entry.name}'`);
+                    if (entry.name === ignoreEntryDirectory) console.log(`\nExcluding directory '${entry.name}'`);
                     return false;
                 }
                 return entry;
             };
-            const mongoFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, database.name);
-            logger.info(`Adding '${mongoFolder}' to zip file ${destination}`);
-            archive.directory(`${mongoFolder}/`, 'mongo', filter);
-            const dataFolder = BootstrapUtils.getTargetNodesFolder(this.params.target, false, `${node.name}/`, 'data');
-            logger.info(`Adding '${dataFolder}' to zip file ${destination}`);
+            archive.directory(mongoFolder, 'mongo', filter);
             archive.directory(dataFolder, 'data', filter);
             await archive.finalize();
         });

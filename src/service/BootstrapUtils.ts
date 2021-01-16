@@ -93,6 +93,26 @@ export class BootstrapUtils {
         });
     })();
 
+    public static getFilesRecursively(path: string): string[] {
+        const isDirectory = (path: string) => statSync(path).isDirectory();
+        const getDirectories = (path: string) =>
+            readdirSync(path)
+                .map((name) => join(path, name))
+                .filter(isDirectory);
+
+        const isFile = (path: string) => statSync(path).isFile();
+        const getFiles = (path: string): string[] =>
+            readdirSync(path)
+                .map((name) => join(path, name))
+                .filter(isFile);
+
+        const dirs = getDirectories(path);
+        const files = dirs
+            .map((dir) => BootstrapUtils.getFilesRecursively(dir)) // go through each directory
+            .reduce((a, b) => a.concat(b), []); // map returns a 2d array (array of file arrays) so flatten
+        return files.concat(getFiles(path));
+    }
+
     public static async download(url: string, dest: string): Promise<boolean> {
         const destinationSize = existsSync(dest) ? statSync(dest).size : -1;
         const isHttpRequest = url.toLowerCase().startsWith('https:') || url.toLowerCase().startsWith('http:');
@@ -114,8 +134,8 @@ export class BootstrapUtils {
             return new Promise((resolve, reject) => {
                 function showDownloadingProgress(received: number, total: number) {
                     const percentage = ((received * 100) / total).toFixed(2);
-                    process.stdout.write(platform() == 'win32' ? '\\033[0G' : '\r');
-                    process.stdout.write(percentage + '% | ' + received + ' bytes downloaded out of ' + total + ' bytes.');
+                    const message = percentage + '% | ' + received + ' bytes downloaded out of ' + total + ' bytes.';
+                    BootstrapUtils.logSameLineMessage(message);
                 }
                 const request = get(url, (response) => {
                     const total = parseInt(response.headers['content-length'] || '0', 10);
@@ -158,6 +178,11 @@ export class BootstrapUtils {
                 });
             });
         }
+    }
+
+    public static logSameLineMessage(message: string): void {
+        process.stdout.write(platform() == 'win32' ? '\\033[0G' : '\r');
+        process.stdout.write(message);
     }
 
     public static deleteFolder(folder: string, excludeFiles: string[] = []): void {
