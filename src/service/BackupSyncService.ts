@@ -53,7 +53,7 @@ export class BackupSyncService {
             presetData.backupSyncLocalCacheFileName || `backup-${presetData.nemesisGenerationHashSeed}.zip`,
         );
         const fileLocation = (await BootstrapUtils.download(presetData.backupSyncLocation, downloadLocation)).fileLocation;
-
+        logger.info(`Restoring data from zip backup '${fileLocation}'`);
         if (this.fullRestore)
             await Promise.all(
                 (presetData.databases || []).map(async (db) => {
@@ -184,7 +184,7 @@ export class BackupSyncService {
                 if (!entry.stats?.isDirectory()) {
                     process++;
                     const percentage = ((process * 100) / totalFiles).toFixed(2);
-                    const message = percentage + '% | ' + process + ' files zipped out of ' + totalFiles;
+                    const message = `${percentage}% | ${process} files zipped out of ${totalFiles}`;
                     BootstrapUtils.logSameLineMessage(message);
                 }
                 const ignoreFiles = ['server.lock', 'broker.started', 'broker.lock'];
