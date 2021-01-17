@@ -15,6 +15,7 @@
  */
 
 import { NetworkType } from 'symbol-sdk';
+import { Preset } from '../service';
 import { NodeType } from './NodeType';
 
 export interface DockerServicePreset {
@@ -131,6 +132,7 @@ export interface FaucetPreset extends DockerServicePreset {
 }
 
 export interface ConfigPreset {
+    preset: Preset;
     votingKeysDirectory: string;
     agentBinaryLocation: string;
     serverVersion: string;

@@ -34,6 +34,9 @@ export type BackupSyncParams = {
 const logger: Logger = LoggerFactory.getLogger(LogType.System);
 
 export class BackupSyncService {
+    // Parial restore + recovery doesn't work yet.
+    public fullRestore = true;
+
     public static defaultParams: BackupSyncParams = {
         target: BootstrapUtils.defaultTargetFolder,
     };
@@ -44,25 +47,26 @@ export class BackupSyncService {
             throw new Error(`Backup Sync cannot be executed. backupSyncLocation has not been defined.`);
         }
         await BootstrapUtils.mkdir(join(this.root, 'backup-sync'));
-        const globalDestination = join(
+        const downloadLocation = join(
             this.root,
             'backup-sync',
             presetData.backupSyncLocalCacheFileName || `backup-${presetData.nemesisGenerationHashSeed}.zip`,
         );
-        await BootstrapUtils.download(presetData.backupSyncLocation, globalDestination);
+        const fileLocation = (await BootstrapUtils.download(presetData.backupSyncLocation, downloadLocation)).fileLocation;
 
-        await Promise.all(
-            (presetData.databases || []).map(async (db) => {
-                const destinationFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, db.name);
-                // if (existsSync(destinationFolder)) {
-                //     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
-                //     return;
-                // }
-                // await BootstrapUtils.deleteFolder(destinationFolder);
-                await BootstrapUtils.mkdir(destinationFolder);
-                await this.unzip(globalDestination, 'mongo', destinationFolder);
-            }),
-        );
+        if (this.fullRestore)
+            await Promise.all(
+                (presetData.databases || []).map(async (db) => {
+                    const destinationFolder = BootstrapUtils.getTargetDatabasesFolder(this.params.target, false, db.name);
+                    // if (existsSync(destinationFolder)) {
+                    //     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
+                    //     return;
+                    // }
+                    // await BootstrapUtils.deleteFolder(destinationFolder);
+                    await BootstrapUtils.mkdir(destinationFolder);
+                    await this.unzip(fileLocation, 'mongo', destinationFolder);
+                }),
+            );
         await Promise.all(
             (presetData.nodes || []).map(async (node) => {
                 const destinationFolder = BootstrapUtils.getTargetNodesFolder(this.params.target, false, node.name, 'data');
@@ -70,11 +74,15 @@ export class BackupSyncService {
                 //     logger.info(`${destinationFolder} exist. Backup Sync ignored.`);
                 //     return;
                 // }
-                // // const seedFolder = presetData.nemesisSeedFolder || join(this.root, 'presets', this.params.preset, 'seed');
-                // // await BootstrapUtils.generateConfiguration({}, seedFolder, destinationFolder);
                 // await BootstrapUtils.deleteFolder(destinationFolder);
+                if (!this.fullRestore) {
+                    const seedFolder = presetData.nemesisSeedFolder || join(this.root, 'presets', presetData.preset, 'seed');
+                    await BootstrapUtils.generateConfiguration({}, seedFolder, destinationFolder);
+                    await BootstrapUtils.writeTextFile(join(destinationFolder, 'server.lock'), '');
+                }
+
                 await BootstrapUtils.mkdir(destinationFolder);
-                await this.unzip(globalDestination, 'data', destinationFolder);
+                await this.unzip(fileLocation, 'data', destinationFolder);
             }),
         );
     }
@@ -84,7 +92,7 @@ export class BackupSyncService {
             file: globalDestination,
             storeEntries: true,
         });
-        logger.info(`Unzipping Backup Sync's ${innerFolder} into ${targetFolder}`);
+        logger.info(`Unzipping Backup Sync's '${innerFolder}' into '${targetFolder}'. This could take a while!`);
         let totalFiles = 0;
         let process = 0;
         return new Promise<void>((resolve, reject) => {
@@ -92,7 +100,7 @@ export class BackupSyncService {
                 if (!entry.isDirectory && totalFiles) {
                     process++;
                     const percentage = ((process * 100) / totalFiles).toFixed(2);
-                    const message = percentage + '% | ' + process + ' files unzipped out of ' + totalFiles;
+                    const message = `${percentage}% | ${process} files unzipped out of ${totalFiles}`;
                     BootstrapUtils.logSameLineMessage(message);
                 }
                 if (BootstrapUtils.stopProcess) {
@@ -104,10 +112,10 @@ export class BackupSyncService {
                 totalFiles = zip.entriesCount;
                 zip.extract(innerFolder, targetFolder, (err) => {
                     zip.close();
-                    logger.info(`Unzipped ${targetFolder} created`);
                     if (err) {
                         reject(err);
                     } else {
+                        logger.info(`Unzipped '${targetFolder}' created`);
                         resolve();
                     }
                 });
@@ -121,7 +129,7 @@ export class BackupSyncService {
         const archive = archiver('zip', {
             zlib: { level: 9 }, // Sets the compression level.
         });
-        logger.info(`Creating zip file ${destination}`);
+        logger.info(`Creating zip file ${destination}. This could take a while!`);
         return new Promise<void>(async (resolve, reject) => {
             // listen for all archive data to be written
             // 'close' event is fired only when a file descriptor is involved

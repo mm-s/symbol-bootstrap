@@ -113,21 +113,24 @@ export class BootstrapUtils {
         return files.concat(getFiles(path));
     }
 
-    public static async download(url: string, dest: string): Promise<boolean> {
+    public static async download(
+        url: string,
+        dest: string,
+    ): Promise<{
+        downloaded: boolean;
+        fileLocation: string;
+    }> {
         const destinationSize = existsSync(dest) ? statSync(dest).size : -1;
         const isHttpRequest = url.toLowerCase().startsWith('https:') || url.toLowerCase().startsWith('http:');
         if (!isHttpRequest) {
             const stats = statSync(url);
             if (existsSync(url) && !stats.isDirectory()) {
-                if (stats.size == destinationSize) {
-                    logger.info(`File ${dest} already exist`);
-                    return false;
-                }
-                logger.info(`Copying ${url} to ${dest}`);
-                await fsPromises.copyFile(url, dest);
-                return true;
+                return {
+                    downloaded: false,
+                    fileLocation: url,
+                };
             } else {
-                throw new Error(`Origin ${url} does not exist`);
+                throw new Error(`Local file ${url} does not exist`);
             }
         } else {
             logger.info(`Checking remote file ${url}`);
@@ -143,11 +146,14 @@ export class BootstrapUtils {
                     if (total === destinationSize) {
                         logger.info(`File ${dest} is up to date with url ${url}. No need to download!`);
                         request.abort();
-                        resolve(false);
+                        resolve({
+                            downloaded: false,
+                            fileLocation: dest,
+                        });
                     } else if (response.statusCode === 200) {
                         existsSync(dest) && unlinkSync(dest);
                         const file = createWriteStream(dest, { flags: 'wx' });
-                        logger.info(`Downloading file ${url}`);
+                        logger.info(`Downloading file ${url}. This could take a while!`);
                         response.pipe(file);
                         response.on('data', function (chunk) {
                             received += chunk.length;
@@ -155,7 +161,10 @@ export class BootstrapUtils {
                         });
 
                         file.on('finish', () => {
-                            resolve(true);
+                            resolve({
+                                downloaded: true,
+                                fileLocation: dest,
+                            });
                         });
 
                         file.on('error', (err) => {
