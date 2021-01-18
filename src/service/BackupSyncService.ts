@@ -85,6 +85,9 @@ export class BackupSyncService {
                 await this.unzip(fileLocation, 'data', destinationFolder);
             }),
         );
+        logger.info(
+            `Zip backup '${fileLocation}' has been restored. HINT: You can remove this file if you want to reclaim the disk space for future use.`,
+        );
     }
 
     private unzip(globalDestination: string, innerFolder: string, targetFolder: string): Promise<void> {
